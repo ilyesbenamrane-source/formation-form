@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>نموذج متابعة التكوين</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<div class="container py-5">
+  <div class="card shadow-lg p-4">
+    <h3 class="text-center mb-4">📋 نموذج متابعة التكوين</h3>
+
+    <form id="kpiForm">
+      <div class="mb-3">
+        <label class="form-label">رقم الهاتف</label>
+        <input type="text" id="phone" name="phone" class="form-control" readonly>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">الاسم الكامل</label>
+        <input type="text" id="name" name="name" class="form-control" required>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">اليوم</label>
+        <input type="text" id="day" name="day" class="form-control" required>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">عدد الفيديوهات</label>
+        <input type="number" id="videos" name="videos" class="form-control" required>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">الحضور</label>
+        <select id="presence" name="presence" class="form-select">
+          <option>Present</option>
+          <option>Absent</option>
+          <option>Late</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">ملاحظات</label>
+        <textarea id="note" name="note" class="form-control"></textarea>
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100">📤 إرسال</button>
+      <div id="msg" class="mt-3 text-center fw-bold"></div>
+    </form>
+  </div>
+</div>
+
+<script>
+const scriptURL = "https://script.google.com/macros/s/AKfycbzbsJU1rK3c6cmIiQi0dCYLH60qCmrrvYZrxI3S6iRv_U22GhIAcDaaEX-TfLXu0XGt7Q/exec"; // ضع هنا رابط Web App
+
+// جلب رقم الهاتف من الرابط
+const params = new URLSearchParams(window.location.search);
+document.getElementById("phone").value = params.get("phone") || "";
+
+// عند الإرسال
+document.getElementById("kpiForm").addEventListener("submit", e => {
+  e.preventDefault();
+
+  const data = {
+    phone: document.getElementById("phone").value,
+    name: document.getElementById("name").value,
+    day: document.getElementById("day").value,
+    videos: document.getElementById("videos").value,
+    presence: document.getElementById("presence").value,
+    note: document.getElementById("note").value
+  };
+
+  fetch(scriptURL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+
+  document.getElementById("msg").innerHTML = "✅ تم إرسال البيانات بنجاح!";
+  document.getElementById("kpiForm").reset();
+});
+</script>
+
+</body>
+</html>
+
+
