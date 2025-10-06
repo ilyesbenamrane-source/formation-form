@@ -14,10 +14,11 @@
     <h3 class="text-center mb-4">نموذج متابعة التكوين</h3>
 
     <form id="kpiForm">
-      <div class="mb-3">
-        <label class="form-label">رقم الهاتف</label>
-        <h3 id="phone" name="phone" mb-4">نموذج متابعة التكوين</h3>
-      </div>
+    <div class="mb-3">
+  <label class="form-label">رقم الهاتف</label>
+  <h5 id="phoneDisplay" class="text-primary"></h5>
+  <input type="hidden" id="phone" name="phone">
+</div>
 
       <div class="mb-3">
         <label class="form-label">الاسم الكامل</label>
@@ -59,7 +60,9 @@ const scriptURL = "https://script.google.com/macros/s/AKfycbzbsJU1rK3c6cmIiQi0dC
 
 // جلب رقم الهاتف من الرابط
 const params = new URLSearchParams(window.location.search);
-document.getElementById("phone").value = params.get("phone") || "";
+const phoneNumber = params.get("phone") || "";
+document.getElementById("phone").value = phoneNumber;
+document.getElementById("phoneDisplay").textContent = phoneNumber;
 
 // عند الإرسال
 document.getElementById("kpiForm").addEventListener("submit", e => {
