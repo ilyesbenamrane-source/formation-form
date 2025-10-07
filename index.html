@@ -405,10 +405,11 @@ const scriptURL = "https://script.google.com/macros/s/AKfycbz-XwHM_QupSRz0rh27uQ
 
 // جلب رقم الهاتف من الرابط
 const params = new URLSearchParams(window.location.search);
-document.getElementById("phone").value = params.get("phone") || "";
+const phone = params.get("phone") || "";
+document.getElementById("phone").value = phone;
 
-// ✅ عرض رقم الهاتف بدل الاسم في القائمة العلوية
-document.getElementById("userNameDisplay").innerText = document.getElementById("phone").value;
+// ✅ عرض رقم الهاتف في مكان الاسم
+document.getElementById("userNameDisplay").innerText = phone;
 
 // عند الإرسال
 document.getElementById("kpiForm").addEventListener("submit", e => {
