@@ -1,10 +1,11 @@
 <!doctype html>
 <html lang="en">
-  <!--begin::Head-->
+  //*******************************************************************************
+  //
+  //*******************************************************************************
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>MMG.Inc</title>
-
     <!--begin::Accessibility Meta Tags-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
     <meta name="color-scheme" content="light dark" />
@@ -26,14 +27,7 @@
     <!--end::Accessibility Features-->
 
     <!--begin::Fonts-->
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/@fontsource/source-sans-3@5.0.12/index.css"
-      integrity="sha256-tXJfXfp6Ewt1ilPzLDtQnJV4hclT9XuaZUKyUvmyr+Q="
-      crossorigin="anonymous"
-      media="print"
-      onload="this.media='all'"
-    />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/source-sans-3@5.0.12/index.css" integrity="sha256-tXJfXfp6Ewt1ilPzLDtQnJV4hclT9XuaZUKyUvmyr+Q=" crossorigin="anonymous" media="print" onload="this.media='all'" />
     <!--end::Fonts-->
 
     <!--begin::Third Party Plugin(OverlayScrollbars)-->
@@ -72,8 +66,9 @@
       crossorigin="anonymous"
     />
   </head>
-  <!--end::Head-->
-  <!--begin::Body-->
+  //*******************************************************************************
+  //
+  //*******************************************************************************
   <body class="layout-fixed sidebar-expand-lg sidebar-open bg-body-tertiary">
     <!--begin::App Wrapper-->
     <div class="app-wrapper">
@@ -97,54 +92,49 @@
           </ul>
           <ul class="navbar-nav ms-auto">
             <!--begin::User Menu Dropdown-->
-            <li class="nav-item dropdown user-menu">
-              <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                <img
-                  src="./assets/img/user2-160x160.jpg"
-                  class="user-image rounded-circle shadow"
-                  alt="User Image"
-                />
-                <span class="d-none d-md-inline">Alexander Pierce</span>
-              </a>
-              <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
-                <!--begin::User Image-->
-                <li class="user-header text-bg-primary">
-                  <img
-                    src="./assets/img/user2-160x160.jpg"
-                    class="rounded-circle shadow"
-                    alt="User Image"
-                  />
-                  <p>
-                    Alexander Pierce - Web Developer
-                    <small>Member since Nov. 2023</small>
-                  </p>
-                </li>
-                <!--end::User Image-->
-                <!--begin::Menu Body-->
-                <li class="user-body">
-                  <!--begin::Row-->
-                  <div class="row">
-                    <div class="col-4 text-center">
-                      <a href="#">Followers</a>
-                    </div>
-                    <div class="col-4 text-center">
-                      <a href="#">Sales</a>
-                    </div>
-                    <div class="col-4 text-center">
-                      <a href="#">Friends</a>
-                    </div>
-                  </div>
-                  <!--end::Row-->
-                </li>
-                <!--end::Menu Body-->
-                <!--begin::Menu Footer-->
-                <li class="user-footer">
-                  <a href="#" class="btn btn-default btn-flat">Profile</a>
-                  <a href="#" class="btn btn-default btn-flat float-end">Sign out</a>
-                </li>
-                <!--end::Menu Footer-->
-              </ul>
-            </li>
+           <li class="nav-item dropdown user-menu">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+    <img
+      src="./assets/img/user2-160x160.jpg"
+      class="user-image rounded-circle shadow"
+      alt="User Image"
+    />
+    <span id="userNameDisplay" class="d-none d-md-inline">Alexander Pierce</span>
+  </a>
+  <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
+    <!--begin::User Image-->
+    <li class="user-header text-bg-primary">
+      <img
+        src="./assets/img/user2-160x160.jpg"
+        class="rounded-circle shadow"
+        alt="User Image"
+      />
+      <p id="userDetails">
+        Alexander Pierce - Web Developer<br>
+        <small>Member since Nov. 2023</small>
+      </p>
+    </li>
+    <!--end::User Image-->
+    <li class="user-body">
+      <div class="row">
+        <div class="col-4 text-center">
+          <a href="#">Followers</a>
+        </div>
+        <div class="col-4 text-center">
+          <a href="#">Sales</a>
+        </div>
+        <div class="col-4 text-center">
+          <a href="#">Friends</a>
+        </div>
+      </div>
+    </li>
+    <li class="user-footer">
+      <a href="#" class="btn btn-default btn-flat">Profile</a>
+      <a href="#" class="btn btn-default btn-flat float-end">Sign out</a>
+    </li>
+  </ul>
+</li>
+
             <!--end::User Menu Dropdown-->
           </ul>
           <!--end::End Navbar Links-->
@@ -152,6 +142,9 @@
         <!--end::Container-->
       </nav>
       <!--end::Header-->
+
+
+      Teste
 
       <footer class="app-footer">
         <!--begin::To the end-->
@@ -413,6 +406,58 @@
       const sparkline3 = new ApexCharts(document.querySelector('#sparkline-3'), option_sparkline3);
       sparkline3.render();
     </script>
+    //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+<script>
+const scriptURL = "https://script.google.com/macros/s/AKfycbxxxxxxxxxxxxxxx/exec"; // ضع هنا رابط Web App
+
+// جلب رقم الهاتف من الرابط
+const params = new URLSearchParams(window.location.search);
+document.getElementById("phone").value = params.get("phone") || "";
+
+// عند الإرسال
+document.getElementById("kpiForm").addEventListener("submit", e => {
+  e.preventDefault();
+
+  const data = {
+    phone: document.getElementById("phone").value,
+    name: document.getElementById("name").value,
+    day: document.getElementById("day").value,
+   // videos: document.getElementById("videos").value,
+   // presence: document.getElementById("presence").value,
+   // note: document.getElementById("note").value
+  };
+
+  fetch(scriptURL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+
+  document.getElementById("msg").innerHTML = "✅ تم إرسال البيانات بنجاح!";
+  document.getElementById("kpiForm").reset();
+});
+</script>
+    <script>
+// عند الضغط على القائمة المنسدلة
+document.querySelector(".user-menu > a").addEventListener("click", () => {
+  const savedData = localStorage.getItem("userData");
+  if (savedData) {
+    const user = JSON.parse(savedData);
+
+    // تحديث الاسم في الشريط العلوي
+    document.getElementById("userNameDisplay").innerText = user.name;
+
+    // تحديث معلومات المستخدم في القائمة المنسدلة
+    document.getElementById("userDetails").innerHTML = `
+      ${user.name} - ${user.phone}<br>
+      <small>تاريخ التسجيل: ${user.day}</small>
+    `;
+  }
+});
+</script>
+
+
     <!--end::Script-->
   </body>
   <!--end::Body-->
