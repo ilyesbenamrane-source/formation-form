@@ -93,7 +93,9 @@
       class="user-image rounded-circle shadow"
       alt="User Image"
     />
-    <span id="userNameDisplay" class="d-none d-md-inline">####</span>
+    
+     <span id="phone" class="form-control" readonly></span>
+
   </a>
   <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
     <!--begin::User Image-->
@@ -403,17 +405,15 @@
 const scriptURL = "https://script.google.com/macros/s/AKfycbz-XwHM_QupSRz0rh27uQcD8IIjmsAjRxm5mzeMmYu1/dev"; // ضع هنا رابط Web App
 
 
+
 // جلب رقم الهاتف من الرابط
 const params = new URLSearchParams(window.location.search);
 const phone = params.get("phone") || "";
-document.getElementById("phone").value = phone;
 
-// ✅ عرض رقم الهاتف في مكان الاسم
-document.getElementById("userNameDisplay").innerText = phone;
+// عرض الرقم داخل span أو p
+document.getElementById("phone").innerText = phone;
 
-// عند الإرسال
-document.getElementById("kpiForm").addEventListener("submit", e => {
-  e.preventDefault();
+
 
   const data = {
     phone: document.getElementById("phone").value,
