@@ -402,9 +402,13 @@
 <script>
 const scriptURL = "https://script.google.com/macros/s/AKfycbz-XwHM_QupSRz0rh27uQcD8IIjmsAjRxm5mzeMmYu1/dev"; // ضع هنا رابط Web App
 
+
 // جلب رقم الهاتف من الرابط
 const params = new URLSearchParams(window.location.search);
 document.getElementById("phone").value = params.get("phone") || "";
+
+// ✅ عرض رقم الهاتف بدل الاسم في القائمة العلوية
+document.getElementById("userNameDisplay").innerText = document.getElementById("phone").value;
 
 // عند الإرسال
 document.getElementById("kpiForm").addEventListener("submit", e => {
@@ -414,9 +418,9 @@ document.getElementById("kpiForm").addEventListener("submit", e => {
     phone: document.getElementById("phone").value,
     name: document.getElementById("name").value,
     day: document.getElementById("day").value,
-   // videos: document.getElementById("videos").value,
-   // presence: document.getElementById("presence").value,
-   // note: document.getElementById("note").value
+    videos: document.getElementById("videos").value,
+    presence: document.getElementById("presence").value,
+    note: document.getElementById("note").value
   };
 
   fetch(scriptURL, {
@@ -430,24 +434,7 @@ document.getElementById("kpiForm").addEventListener("submit", e => {
   document.getElementById("kpiForm").reset();
 });
 </script>
-    <script>
-// عند الضغط على القائمة المنسدلة
-document.querySelector(".user-menu > a").addEventListener("click", () => {
-  const savedData = localStorage.getItem("userData");
-  if (savedData) {
-    const user = JSON.parse(savedData);
 
-    // تحديث الاسم في الشريط العلوي
-    document.getElementById("userNameDisplay").innerText = user.name;
-
-    // تحديث معلومات المستخدم في القائمة المنسدلة
-    document.getElementById("userDetails").innerHTML = `
-      ${user.name} - ${user.phone}<br>
-      <small>تاريخ التسجيل: ${user.day}</small>
-    `;
-  }
-});
-</script>
 
 
     <!--end::Script-->
