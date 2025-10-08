@@ -3,111 +3,68 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>نموذج متابعة أسبوع 1</title>
+  <title>لوحة التقييم الأسبوعي</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body {
       background-color: #f8f9fa;
       font-family: 'Cairo', sans-serif;
     }
-    .card {
+    .week-card {
+      transition: 0.3s;
       border-radius: 15px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      cursor: pointer;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
     }
-    th {
-      background-color: #0d6efd;
-      color: white;
-      text-align: center;
+    .week-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.15);
     }
-    td {
-      text-align: center;
-      vertical-align: middle;
-    }
-    .btn-submit {
-      background-color: #198754;
-      color: white;
-      border-radius: 10px;
-      padding: 10px 30px;
+    .week-card h4 {
+      font-weight: 700;
+      color: #0d6efd;
     }
   </style>
 </head>
 <body>
 
-<div class="container py-4">
-  <div class="text-center mb-4">
-    <h4 class="fw-bold">Chapitre 1 : Recherche produits et Prix de vente</h4>
-    <p class="text-muted">قيّم نشاطك اليومي خلال هذا الأسبوع</p>
-  </div>
+<div class="container text-center py-5">
+  <h2 class="fw-bold text-primary mb-4">📅 لوحة التقييم الأسبوعي</h2>
+  <p class="text-muted mb-5">اختر الأسبوع الذي ترغب في تعبئة تقييمه 👇</p>
 
-  <div class="card p-4">
-    <table class="table table-bordered align-middle">
-      <thead>
-        <tr>
-          <th>اليوم</th>
-          <th>عدد الفيديوهات</th>
-          <th>LIVE</th>
-          <th>المجتمع</th>
-          <th>العلاقات</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>الإثنين</td>
-          <td><input type="number" class="form-control text-center" min="0"></td>
-          <td><input type="checkbox" class="form-check-input"></td>
-          <td><input type="checkbox" class="form-check-input"></td>
-          <td><input type="checkbox" class="form-check-input"></td>
-        </tr>
-        <tr>
-          <td>الثلاثاء</td>
-          <td><input type="number" class="form-control text-center" min="0"></td>
-          <td><input type="checkbox" class="form-check-input"></td>
-          <td><input type="checkbox" class="form-check-input"></td>
-          <td><input type="checkbox" class="form-check-input"></td>
-        </tr>
-        <tr>
-          <td>الأربعاء</td>
-          <td><input type="number" class="form-control text-center" min="0"></td>
-          <td><input type="checkbox" class="form-check-input"></td>
-          <td><input type="checkbox" class="form-check-input"></td>
-          <td><input type="checkbox" class="form-check-input"></td>
-        </tr>
-        <tr>
-          <td>الخميس</td>
-          <td><input type="number" class="form-control text-center" min="0"></td>
-          <td><input type="checkbox" class="form-check-input"></td>
-          <td><input type="checkbox" class="form-check-input"></td>
-          <td><input type="checkbox" class="form-check-input"></td>
-        </tr>
-        <tr>
-          <td>الجمعة</td>
-          <td><input type="number" class="form-control text-center" min="0"></td>
-          <td><input type="checkbox" class="form-check-input"></td>
-          <td><input type="checkbox" class="form-check-input"></td>
-          <td><input type="checkbox" class="form-check-input"></td>
-        </tr>
-        <tr>
-          <td>السبت</td>
-          <td><input type="number" class="form-control text-center" min="0"></td>
-          <td><input type="checkbox" class="form-check-input"></td>
-          <td><input type="checkbox" class="form-check-input"></td>
-          <td><input type="checkbox" class="form-check-input"></td>
-        </tr>
-        <tr>
-          <td>الأحد</td>
-          <td><input type="number" class="form-control text-center" min="0"></td>
-          <td><input type="checkbox" class="form-check-input"></td>
-          <td><input type="checkbox" class="form-check-input"></td>
-          <td><input type="checkbox" class="form-check-input"></td>
-        </tr>
-      </tbody>
-    </table>
-
-    <div class="text-center mt-4">
-      <button class="btn btn-submit">إرسال التقييم الأسبوعي ✅</button>
+  <div class="row g-4 justify-content-center">
+    <div class="col-10 col-sm-6 col-md-3">
+      <div class="card week-card p-4" onclick="goTo('week1.html')">
+        <h4>الأسبوع 1</h4>
+        <p class="text-muted">Chapitre 1: Prix de vente</p>
+      </div>
+    </div>
+    <div class="col-10 col-sm-6 col-md-3">
+      <div class="card week-card p-4" onclick="goTo('week2.html')">
+        <h4>الأسبوع 2</h4>
+        <p class="text-muted">Chapitre 2: Gestion des coûts</p>
+      </div>
+    </div>
+    <div class="col-10 col-sm-6 col-md-3">
+      <div class="card week-card p-4" onclick="goTo('week3.html')">
+        <h4>الأسبوع 3</h4>
+        <p class="text-muted">Chapitre 3: Stratégie marketing</p>
+      </div>
+    </div>
+    <div class="col-10 col-sm-6 col-md-3">
+      <div class="card week-card p-4" onclick="goTo('week4.html')">
+        <h4>الأسبوع 4</h4>
+        <p class="text-muted">Chapitre 4: Plan de croissance</p>
+      </div>
     </div>
   </div>
 </div>
+
+<script>
+  function goTo(page) {
+    window.location.href = page;
+  }
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
