@@ -2,58 +2,65 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>تسجيل الدخول بـ Google</title>
+  <title>تسجيل دخول المشرف</title>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
-<body>
-  <h3>تسجيل الدخول</h3>
+<body style="text-align:center; margin-top:50px; font-family:tajawal, sans-serif;">
+  <h2>تسجيل الدخول</h2>
+  <p>سجّل الدخول باستخدام حساب Google للتحقق من صلاحيتك</p>
 
   <div id="g_id_onload"
        data-client_id="1045715620879-4autgqus71bv0501bevcc08gs8s5bodn.apps.googleusercontent.com"
-       data-callback="handleCredentialResponse">
+       data-callback="handleCredentialResponse"
+       data-auto_select="true">
   </div>
 
   <div class="g_id_signin" data-type="standard"></div>
 
-  <pre id="output"></pre>
+  <pre id="status"></pre>
 
-<script>
-  function handleCredentialResponse(response) {
-    // عرض التوكن في الكونسول (للتأكد فقط)
-    console.log("ID Token:", response.credential);
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw-hmBrKRsI0VFx1C3QU5lLqgGuSJVWeVOmcuGTvWrxJaWQFqfsFkxbNMAB1IVZl6GWVg/exec";
 
-    // فك تشفير الـ token
-    const base64Url = response.credential.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split('')
-        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join('')
-    );
+    function handleCredentialResponse(response) {
+      if (!response.credential) {
+        alert("❌ لم يتم استلام أي Token");
+        return;
+      }
 
-    const user = JSON.parse(jsonPayload);
+      // فك التوكن JWT
+      const base64Url = response.credential.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const user = JSON.parse(decodeURIComponent(atob(base64).split('').map(c =>
+        '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+      ).join('')));
 
-    // استخراج البيانات
-    const email = user.email;
-    const name = user.name;
-    const picture = user.picture;
+      const email = user.email;
+      document.getElementById("status").innerText = "🔍 جاري التحقق من البريد: " + email;
 
-    // عرضها على الصفحة
-    document.body.innerHTML = `
-      <div style="text-align:center; margin-top:50px">
-        <img src="${picture}" style="border-radius:50%; width:80px; height:80px"><br>
-        <h3>${name}</h3>
-        <p>📧 ${email}</p>
-      </div>
-    `;
-
-    console.log("Decoded info:", user);
-  }
-</script>
-
+      // إرسال البريد إلى Google Apps Script للتحقق من الصلاحية
+      fetch(SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.access) {
+          document.getElementById("status").innerText = "✅ مرحبًا " + data.name + " - لديك صلاحية: " + data.role;
+          // إعادة التوجيه للوحة التحكم
+          setTimeout(() => { window.location.href = "dashboard.html"; }, 1500);
+        } else {
+          document.getElementById("status").innerText = "🚫 غير مصرح لك بالدخول";
+        }
+      })
+      .catch(err => {
+        document.getElementById("status").innerText = "⚠️ خطأ في الاتصال: " + err.message;
+      });
+    }
+  </script>
 </body>
 </html>
+
 
 
