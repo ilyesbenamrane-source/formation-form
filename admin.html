@@ -3,91 +3,63 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>👨‍🎓 لوحة المشرف – GitHub Version</title>
+  <title>تحقق المشرف – تسجيل دخول Google</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
-    body { background-color: #f8f9fa; font-family: "Tajawal", sans-serif; }
-    .card { border-radius: 20px; border: none; }
+    body { background: #f8f9fa; font-family: "Tajawal", sans-serif; }
+    .container { margin-top: 80px; max-width: 450px; }
   </style>
 </head>
 <body class="text-center">
 
-  <div class="container py-5">
-    <h2 class="text-primary mb-3">🎓 لوحة المشرف – من GitHub Pages</h2>
-    <p class="text-muted">تحقق من البريد الإلكتروني ثم أضف طالبًا جديدًا</p>
-
-    <div class="card shadow p-4 mt-4">
-      <div class="mb-3">
-        <label class="form-label">بريد المشرف (للتسجيل والتحقق)</label>
-        <input type="email" id="adminEmail" class="form-control text-center" placeholder="example@gmail.com">
-      </div>
-      <hr>
-      <div class="mb-3">
-        <label class="form-label">اسم الطالب</label>
-        <input type="text" id="name" class="form-control text-center">
-      </div>
-      <div class="mb-3">
-        <label class="form-label">رقم الهاتف</label>
-        <input type="text" id="phone" class="form-control text-center">
-      </div>
-      <div class="mb-3">
-        <label class="form-label">البريد الإلكتروني للطالب</label>
-        <input type="email" id="studentEmail" class="form-control text-center">
-      </div>
-      <div class="mb-3">
-        <label class="form-label">المستوى الدراسي</label>
-        <select id="level" class="form-select text-center">
-          <option>ابتدائي</option>
-          <option>متوسط</option>
-          <option>ثانوي</option>
-          <option>جامعي</option>
-        </select>
-      </div>
-      <button class="btn btn-primary w-100" onclick="submitStudent()">إرسال البيانات ✅</button>
-      <p id="result" class="fw-bold mt-3"></p>
+  <div class="container">
+    <h3 class="mb-4 text-primary">🎓 تسجيل دخول المشرف</h3>
+    <p class="text-muted">يرجى تسجيل الدخول بحساب Google الخاص بك للتحقق من الصلاحيات</p>
+    <div id="g_id_onload"
+         data-client_id="YOUR_GOOGLE_CLIENT_ID"
+         data-callback="handleCredentialResponse"
+         data-auto_select="true">
     </div>
+
+    <div class="g_id_signin" data-type="standard"></div>
+    <p id="result" class="fw-bold mt-4"></p>
   </div>
 
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz-XwHM_QupSRz0rh27uQcD8IIjmsAjRxm5mzeMmYu1/dev";
 
-    async function submitStudent() {
-      const adminEmail = document.getElementById("adminEmail").value.trim();
-      const name = document.getElementById("name").value.trim();
-      const phone = document.getElementById("phone").value.trim();
-      const studentEmail = document.getElementById("studentEmail").value.trim();
-      const level = document.getElementById("level").value;
+    async function handleCredentialResponse(response) {
+      // استخراج بيانات المستخدم من الـ JWT
+      const data = parseJwt(response.credential);
+      const email = data.email;
+      document.getElementById("result").innerText = "🔍 جاري التحقق من صلاحية البريد: " + email;
 
-      if (!adminEmail || !name || !phone || !studentEmail) {
-        document.getElementById("result").innerText = "⚠️ الرجاء ملء جميع الحقول.";
-        return;
-      }
+      // إرسال البريد إلى Google Apps Script للتحقق
+      const res = await fetch(SCRIPT_URL + "?email=" + encodeURIComponent(email));
+      const json = await res.json();
 
-      document.getElementById("result").innerText = "⏳ جاري إرسال البيانات...";
-
-      const payload = {
-        email: adminEmail,
-        name: name,
-        phone: phone,
-        studentEmail: studentEmail,
-        level: level
-      };
-
-      try {
-        const res = await fetch(SCRIPT_URL, {
-          method: "POST",
-          mode: "no-cors", // قد تحتاج إلى cors لاحقًا عند التحقق
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-
-        // للأسف لا يمكن قراءة الرد في no-cors، لذلك يمكن استخدام redirect HTML في Apps Script بدل JSON
-        document.getElementById("result").innerText = "✅ تم إرسال البيانات بنجاح (تحقق في Google Sheet)";
-
-      } catch (err) {
-        document.getElementById("result").innerText = "❌ خطأ في الإرسال: " + err.message;
+      if (json.allowed) {
+        document.getElementById("result").innerText = "✅ مرحبًا " + email + " – لديك صلاحية الدخول";
+        window.location.href = "dashboard.html"; // صفحة لوحة التحكم
+      } else {
+        document.getElementById("result").innerText = "🚫 البريد غير مصرح له بالدخول";
+        setTimeout(() => {
+          window.location.href = "noaccess.html";
+        }, 2000);
       }
     }
+
+    // دالة لفك تشفير بيانات JWT القادمة من Google
+    function parseJwt(token) {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map(c =>
+        '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+      ).join(''));
+      return JSON.parse(jsonPayload);
+    }
   </script>
+
 </body>
 </html>
