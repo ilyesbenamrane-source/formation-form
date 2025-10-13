@@ -1,69 +1,93 @@
-<!-- admin.html -->
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>لوحة المشرف</title>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>👨‍🎓 لوحة المشرف – GitHub Version</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background-color: #f8f9fa; font-family: "Tajawal", sans-serif; }
+    .card { border-radius: 20px; border: none; }
+  </style>
 </head>
-<body class="bg-light">
-  <div class="container py-5">
-    <h2 class="text-center mb-4 text-primary">👨‍🎓 لوحة المشرف – إضافة طالب جديد</h2>
-    <div id="userEmail" class="text-center text-muted mb-3">جارٍ التحقق...</div>
+<body class="text-center">
 
-    <div class="card shadow p-4">
-      <!-- form -->
+  <div class="container py-5">
+    <h2 class="text-primary mb-3">🎓 لوحة المشرف – من GitHub Pages</h2>
+    <p class="text-muted">تحقق من البريد الإلكتروني ثم أضف طالبًا جديدًا</p>
+
+    <div class="card shadow p-4 mt-4">
       <div class="mb-3">
-        <label class="form-label">الاسم الكامل</label>
-        <input type="text" id="name" class="form-control">
+        <label class="form-label">بريد المشرف (للتسجيل والتحقق)</label>
+        <input type="email" id="adminEmail" class="form-control text-center" placeholder="example@gmail.com">
+      </div>
+      <hr>
+      <div class="mb-3">
+        <label class="form-label">اسم الطالب</label>
+        <input type="text" id="name" class="form-control text-center">
       </div>
       <div class="mb-3">
         <label class="form-label">رقم الهاتف</label>
-        <input type="text" id="phone" class="form-control">
+        <input type="text" id="phone" class="form-control text-center">
       </div>
       <div class="mb-3">
-        <label class="form-label">البريد الإلكتروني</label>
-        <input type="email" id="email" class="form-control">
+        <label class="form-label">البريد الإلكتروني للطالب</label>
+        <input type="email" id="studentEmail" class="form-control text-center">
       </div>
       <div class="mb-3">
         <label class="form-label">المستوى الدراسي</label>
-        <select id="level" class="form-select">
+        <select id="level" class="form-select text-center">
           <option>ابتدائي</option>
           <option>متوسط</option>
           <option>ثانوي</option>
           <option>جامعي</option>
         </select>
       </div>
-      <div class="text-center">
-        <button class="btn btn-primary px-5" onclick="submitStudent()">إضافة الطالب ✅</button>
-      </div>
+      <button class="btn btn-primary w-100" onclick="submitStudent()">إرسال البيانات ✅</button>
+      <p id="result" class="fw-bold mt-3"></p>
     </div>
-    <p id="result" class="mt-4 text-center fw-bold"></p>
   </div>
 
-<script>
-  // احصل على البريد من الخادم (Session) وأعرضه
-  function showEmail() {
-    google.script.run.withSuccessHandler(function(email){
-      document.getElementById('userEmail').innerText = "المستخدم: " + (email || "(غير معروف)");
-    }).getSessionEmail(); // سنضيف هذه الدالة في Code.gs لو احتجنا
-  }
-  // إرسال الطالب
-  function submitStudent(){
-    const student = {
-      name: document.getElementById("name").value,
-      phone: document.getElementById("phone").value,
-      email: document.getElementById("email").value,
-      level: document.getElementById("level").value
-    };
-    google.script.run.withSuccessHandler(function(msg){
-      document.getElementById("result").innerText = msg;
-      document.getElementById("name").value = "";
-      document.getElementById("phone").value = "";
-      document.getElementById("email").value = "";
-    }).addStudent(student);
-  }
-  // نفّذ عند تحميل الصفحة
-  window.onload = function(){ showEmail(); };
-</script>
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz-XwHM_QupSRz0rh27uQcD8IIjmsAjRxm5mzeMmYu1/dev";
+
+    async function submitStudent() {
+      const adminEmail = document.getElementById("adminEmail").value.trim();
+      const name = document.getElementById("name").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      const studentEmail = document.getElementById("studentEmail").value.trim();
+      const level = document.getElementById("level").value;
+
+      if (!adminEmail || !name || !phone || !studentEmail) {
+        document.getElementById("result").innerText = "⚠️ الرجاء ملء جميع الحقول.";
+        return;
+      }
+
+      document.getElementById("result").innerText = "⏳ جاري إرسال البيانات...";
+
+      const payload = {
+        email: adminEmail,
+        name: name,
+        phone: phone,
+        studentEmail: studentEmail,
+        level: level
+      };
+
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors", // قد تحتاج إلى cors لاحقًا عند التحقق
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        // للأسف لا يمكن قراءة الرد في no-cors، لذلك يمكن استخدام redirect HTML في Apps Script بدل JSON
+        document.getElementById("result").innerText = "✅ تم إرسال البيانات بنجاح (تحقق في Google Sheet)";
+
+      } catch (err) {
+        document.getElementById("result").innerText = "❌ خطأ في الإرسال: " + err.message;
+      }
+    }
+  </script>
 </body>
 </html>
