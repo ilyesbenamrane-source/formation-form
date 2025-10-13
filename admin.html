@@ -1,118 +1,132 @@
-<!doctype html>
-<html lang="ar">
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Login with Google (GitHub Pages)</title>
-  <style>
-    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; padding: 2rem; direction: rtl; }
-    .card { max-width: 720px; margin: 0 auto; padding: 1.5rem; border-radius: 8px; box-shadow: 0 6px 18px rgba(0,0,0,0.08); }
-    pre { background:#f6f8fa; padding:0.75rem; border-radius:6px; overflow:auto }
-  </style>
-  <!-- Google Identity Services library -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>تحقق المشرف</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <style>
+    body { background-color: #f8f9fa; font-family: 'Tajawal', sans-serif; }
+    .container { margin-top: 80px; max-width: 520px; }
+    #status { margin-top: 14px; font-weight: 600; min-height: 1.4em; }
+    pre { text-align: left; direction: ltr; background:#fff; border-radius:6px; padding:12px; box-shadow:0 1px 3px rgba(0,0,0,.06) }
+  </style>
 </head>
-<body>
-  <div class="card">
-    <h1>تسجيل الدخول عبر Google</h1>
-    <p>اضغط زر تسجيل الدخول لإعطاء الإذن وعرض البريد الإلكتروني المصرّح به.</p>
+<body class="text-center">
 
-    <!-- مكان زر Google -->
-    <div id="g_id_button"></div>
+  <div class="container">
+    <h3 class="text-primary mb-2">🎓 تسجيل دخول المشرف</h3>
+    <p class="text-muted mb-4">سجّل الدخول عبر Google للتحقق من صلاحياتك.</p>
 
-    <h3>معلومات المستخدم (من ID token)</h3>
-    <pre id="userinfo">لم يتم تسجيل الدخول بعد.</pre>
+    <!-- إعداد GSI: ضع CLIENT_ID الصحيح أدناه -->
+    <div id="g_id_onload"
+         data-client_id="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
+         data-callback="handleCredentialResponse"
+         data-auto_select="false">
+    </div>
+    <div class="g_id_signin" data-type="standard"></div>
 
-    <button id="signout" style="display:none">تسجيل الخروج</button>
+    <p id="status" class="text-secondary">لم يتم تسجيل الدخول بعد.</p>
+
+    <div id="debug" style="display:none">
+      <h6 class="mt-3">معلومات (Debug)</h6>
+      <pre id="userinfo">-</pre>
+    </div>
   </div>
 
   <script>
-    const CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"; // ضع هنا Client ID
+    // ضع هنا رابط سكربت Google Apps Script أو باك-إند الذي يتحقق من id_token
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyd7OsvKLT0UQGJWZw_hjrTZydRmK19FZkTQ60lsQnXxv_VXMHOQMSYVO_lNhbAxVcGVQ/exec"; // غيره
+    const CLIENT_ID = "1045715620879-4autgqus71bv0501bevcc08gs8s5bodn.apps.googleusercontent.com"; // غيره
 
-    // دالة بسيطة لفك تشفير JWT (ID token) بدون تحقق — فقط لقراءة الحقول.
-    function parseJwt (token) {
+    // فك JWT لعرض الحقول للـ debug فقط (لا تعتمد عليه للأمان)
+    function parseJwt(token) {
       try {
-        const base64Url = token.split('.')[1];
+        const base64Url = token.split('.')[1] || '';
         const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-        }).join(''));
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(c =>
+          '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+        ).join(''));
         return JSON.parse(jsonPayload);
       } catch (e) {
         return null;
       }
     }
 
-    // تهيئة زر GSI
-    window.onload = function () {
-      if (!CLIENT_ID || CLIENT_ID.includes("YOUR_GOOGLE_CLIENT_ID")) {
-        document.getElementById('userinfo').textContent = "خطأ: ضع CLIENT_ID صالح في الكود (من Google Console).";
-        return;
-      }
-
-      // initialization
-      google.accounts.id.initialize({
-        client_id: CLIENT_ID,
-        callback: handleCredentialResponse,
-        // optional: ملحوظة - يمكنك تحديد auto_select, ux_mode, وغيرها
-      });
-
-      // render a button
-      google.accounts.id.renderButton(
-        document.getElementById("g_id_button"),
-        { theme: "outline", size: "large", text: "signin_with", locale: "ar" } // options
-      );
-
-      // optional: show One Tap
-      // google.accounts.id.prompt(); // لإظهار One-Tap popup (اختياري)
-    };
-
-    function handleCredentialResponse(response) {
-      // response.credential هو ID token (JWT)
+    async function handleCredentialResponse(response) {
+      const statusEl = document.getElementById('status');
+      statusEl.className = 'text-secondary';
       if (!response || !response.credential) {
-        document.getElementById('userinfo').textContent = "لم يصل أي ID token.";
+        statusEl.innerText = "⚠️ لم نستلم رمز التعريف (ID token).";
         return;
       }
 
-      const idToken = response.credential;
-      const payload = parseJwt(idToken);
-
+      // decode for UI (only)
+      const payload = parseJwt(response.credential);
       if (!payload) {
-        document.getElementById('userinfo').textContent = "فشل تحليل الـ ID token.";
+        statusEl.innerText = "⚠️ لا يمكن تحليل الـ ID token محليًا.";
         return;
       }
 
-      // هنا نقرأ الحقول: email, name, picture, sub (user id)...
-      const info = {
-        email: payload.email,
-        email_verified: payload.email_verified,
-        name: payload.name,
-        given_name: payload.given_name,
-        family_name: payload.family_name,
-        picture: payload.picture,
-        locale: payload.locale,
-        iss: payload.iss,
-        aud: payload.aud,
-        sub: payload.sub,
-        exp: payload.exp,
-        iat: payload.iat
-      };
+      // عرض مؤقت
+      statusEl.innerText = `🔍 التحقق من ${payload.email || 'المستخدم'}...`;
 
-      document.getElementById('userinfo').textContent = JSON.stringify(info, null, 2);
-      // اظهار زر الخروج
-      document.getElementById('signout').style.display = 'inline-block';
-      // إخفاء زر Google (اختياري)
-      // document.getElementById('g_id_button').style.display = 'none';
+      // ارسال id_token إلى السكربت عبر POST (آمن أكثر من وضعه في query string)
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          mode: 'cors',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            id_token: response.credential
+          }),
+          // credentials: 'include' // فقط إن احتجت إرسال كوكيز
+        });
+
+        // محاولة قراءة JSON
+        const text = await res.text();
+        let json;
+        try { json = JSON.parse(text); } catch(e) {
+          throw new Error('رد السيرفر ليس JSON صالح: ' + text);
+        }
+
+        console.log('Server response:', json);
+
+        if (res.ok && json && json.allowed === true) {
+          statusEl.className = 'text-success';
+          statusEl.innerText = '✅ لديك صلاحية الدخول — جارٍ التحويل...';
+          // اختياري: خزّن بعض بيانات الجلسة في sessionStorage
+          // sessionStorage.setItem('user', JSON.stringify(json.user || payload));
+          setTimeout(() => { window.location.href = 'dashboard.html'; }, 800);
+        } else {
+          statusEl.className = 'text-danger';
+          statusEl.innerText = '🚫 غير مصرح لك بالدخول';
+          // إظهار سبب رفض إن وُجد
+          if (json && json.reason) {
+            const r = document.createElement('div');
+            r.className = 'small text-muted mt-2';
+            r.innerText = json.reason;
+            document.querySelector('.container').appendChild(r);
+          }
+          setTimeout(() => { window.location.href = 'noaccess.html'; }, 1300);
+        }
+
+        // debug
+        document.getElementById('debug').style.display = 'block';
+        document.getElementById('userinfo').innerText = JSON.stringify({
+          token_payload: payload,
+          server: json
+        }, null, 2);
+
+      } catch (err) {
+        console.error('Fetch/Error:', err);
+        statusEl.className = 'text-warning';
+        statusEl.innerText = '⚠️ خطأ في الاتصال أو الرد: ' + (err.message || err);
+      }
     }
-
-    // تسجيل خروج بسيط (على الكلاينت فقط)
-    document.getElementById('signout').addEventListener('click', () => {
-      google.accounts.id.disableAutoSelect(); // تعطيل auto select
-      document.getElementById('userinfo').textContent = 'تم تسجيل الخروج.';
-      document.getElementById('signout').style.display = 'none';
-      // اختياري: اعادة اظهار الزر
-      // document.getElementById('g_id_button').style.display = 'block';
-    });
   </script>
 </body>
 </html>
