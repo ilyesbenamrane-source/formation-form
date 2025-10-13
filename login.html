@@ -18,22 +18,41 @@
 
   <pre id="output"></pre>
 
-  <script>
-    function handleCredentialResponse(response) {
-      console.log("Response object:", response);
-      document.getElementById("output").textContent = JSON.stringify(response, null, 2);
+<script>
+  function handleCredentialResponse(response) {
+    // عرض التوكن في الكونسول (للتأكد فقط)
+    console.log("ID Token:", response.credential);
 
-      if (!response.credential) {
-        alert("❌ لم يتم استلام أي Token. تأكد من أن Client ID صحيح وأن الصفحة تعمل من HTTPS أو Localhost.");
-        return;
-      }
+    // فك تشفير الـ token
+    const base64Url = response.credential.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
 
-      // طباعة محتوى التوكن بعد فكّه
-      const payload = JSON.parse(atob(response.credential.split('.')[1]));
-      console.log("Decoded payload:", payload);
-      alert("✅ تم تسجيل الدخول كـ: " + payload.email);
-    }
-  </script>
+    const user = JSON.parse(jsonPayload);
+
+    // استخراج البيانات
+    const email = user.email;
+    const name = user.name;
+    const picture = user.picture;
+
+    // عرضها على الصفحة
+    document.body.innerHTML = `
+      <div style="text-align:center; margin-top:50px">
+        <img src="${picture}" style="border-radius:50%; width:80px; height:80px"><br>
+        <h3>${name}</h3>
+        <p>📧 ${email}</p>
+      </div>
+    `;
+
+    console.log("Decoded info:", user);
+  }
+</script>
+
 </body>
 </html>
 
