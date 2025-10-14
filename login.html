@@ -1,26 +1,24 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <title>تسجيل دخول المشرف</title>
+  <meta name="google-signin-client_id" content="1045715620879-4autgqus71bv0501bevcc08gs8s5bodn.apps.googleusercontent.com">
   <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <title>تسجيل الدخول</title>
 </head>
-<body style="text-align:center; margin-top:50px; font-family:tajawal, sans-serif;">
-  <h2>تسجيل الدخول</h2>
-  <p>سجّل الدخول باستخدام حساب Google للتحقق من صلاحيتك</p>
+<body style="font-family: sans-serif; text-align:center; margin-top: 100px;">
 
+  <h2>🔐 بوابة تسجيل الدخول</h2>
   <div id="g_id_onload"
-       data-client_id="1045715620879-4autgqus71bv0501bevcc08gs8s5bodn.apps.googleusercontent.com"
-       data-callback="handleCredentialResponse"
-       data-auto_select="true">
+       data-client_id="YOUR_CLIENT_ID.apps.googleusercontent.com"
+       data-callback="handleCredentialResponse">
   </div>
-
   <div class="g_id_signin" data-type="standard"></div>
 
-  <pre id="status"></pre>
+  <p id="status" style="margin-top:20px; font-weight:bold;"></p>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw-hmBrKRsI0VFx1C3QU5lLqgGuSJVWeVOmcuGTvWrxJaWQFqfsFkxbNMAB1IVZl6GWVg/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz-XwHM_QupSRz0rh27uQcD8IIjmsAjRxm5mzeMmYu1/dev";
 
     function handleCredentialResponse(response) {
       if (!response.credential) {
@@ -28,7 +26,7 @@
         return;
       }
 
-      // فك التوكن JWT
+      // 🧩 فك التوكن JWT للحصول على البريد
       const base64Url = response.credential.split('.')[1];
       const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
       const user = JSON.parse(decodeURIComponent(atob(base64).split('').map(c =>
@@ -38,7 +36,7 @@
       const email = user.email;
       document.getElementById("status").innerText = "🔍 جاري التحقق من البريد: " + email;
 
-      // إرسال البريد إلى Google Apps Script للتحقق من الصلاحية
+      // 🧠 تحقق من الشيت
       fetch(SCRIPT_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -47,11 +45,12 @@
       .then(res => res.json())
       .then(data => {
         if (data.access) {
-          document.getElementById("status").innerText = "✅ مرحبًا " + data.name + " - لديك صلاحية: " + data.role;
-          // إعادة التوجيه للوحة التحكم
-          setTimeout(() => { window.location.href = "dashboard.html"; }, 1500);
+          document.getElementById("status").innerText = "✅ مرحبًا " + data.name + " - لديك صلاحية الدخول";
+          setTimeout(() => {
+            window.location.href = "dashboard.html";
+          }, 1500);
         } else {
-          document.getElementById("status").innerText = "🚫 غير مصرح لك بالدخول";
+          document.getElementById("status").innerText = "🚫 البريد غير مسموح بالدخول";
         }
       })
       .catch(err => {
