@@ -17,47 +17,42 @@
 
   <p id="status" style="margin-top:20px; font-weight:bold;"></p>
 
-  <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz-XwHM_QupSRz0rh27uQcD8IIjmsAjRxm5mzeMmYu1/dev";
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw-hmBrKRsI0VFx1C3QU5lLqgGuSJVWeVOmcuGTvWrxJaWQFqfsFkxbNMAB1IVZl6GWVg/exec";
 
-    function handleCredentialResponse(response) {
-      if (!response.credential) {
-        alert("❌ لم يتم استلام أي Token");
-        return;
+function handleCredentialResponse(response) {
+  if (!response.credential) {
+    alert("❌ لم يتم استلام أي Token");
+    return;
+  }
+
+  // فك التوكن JWT واستخراج الإيميل
+  const base64Url = response.credential.split('.')[1];
+  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+  const user = JSON.parse(decodeURIComponent(atob(base64).split('').map(c =>
+    '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+  ).join('')));
+
+  const email = user.email;
+  document.getElementById("status").innerText = "🔍 جاري التحقق من البريد: " + email;
+
+  // إرسال البريد إلى Google Apps Script للتحقق
+  fetch(SCRIPT_URL + "?email=" + encodeURIComponent(email))
+    .then(res => res.json())
+    .then(data => {
+      if (data.access) {
+        document.getElementById("status").innerText = "✅ مرحبًا " + data.name + " - لديك صلاحية الدخول";
+        setTimeout(() => { window.location.href = "dashboard.html"; }, 1500);
+      } else {
+        document.getElementById("status").innerText = "🚫 غير مصرح لك بالدخول";
       }
+    })
+    .catch(err => {
+      document.getElementById("status").innerText = "⚠️ خطأ في الاتصال: " + err.message;
+    });
+}
+</script>
 
-      // 🧩 فك التوكن JWT للحصول على البريد
-      const base64Url = response.credential.split('.')[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const user = JSON.parse(decodeURIComponent(atob(base64).split('').map(c =>
-        '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
-      ).join('')));
-
-      const email = user.email;
-      document.getElementById("status").innerText = "🔍 جاري التحقق من البريد: " + email;
-
-      // 🧠 تحقق من الشيت
-      fetch(SCRIPT_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.access) {
-          document.getElementById("status").innerText = "✅ مرحبًا " + data.name + " - لديك صلاحية الدخول";
-          setTimeout(() => {
-            window.location.href = "dashboard.html";
-          }, 1500);
-        } else {
-          document.getElementById("status").innerText = "🚫 البريد غير مسموح بالدخول";
-        }
-      })
-      .catch(err => {
-        document.getElementById("status").innerText = "⚠️ خطأ في الاتصال: " + err.message;
-      });
-    }
-  </script>
 </body>
 </html>
 
