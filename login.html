@@ -36,21 +36,21 @@ function handleCredentialResponse(response) {
   const email = user.email;
   document.getElementById("status").innerText = "🔍 جاري التحقق من البريد: " + email;
 
-  // إرسال البريد إلى Google Apps Script للتحقق
-  fetch(SCRIPT_URL + "?email=" + encodeURIComponent(email))
-    .then(res => res.json())
-    .then(data => {
-      if (data.access) {
-        document.getElementById("status").innerText = "✅ مرحبًا " + data.name + " - لديك صلاحية الدخول";
-        setTimeout(() => { window.location.href = "dashboard.html"; }, 1500);
-      } else {
-        document.getElementById("status").innerText = "🚫 غير مصرح لك بالدخول";
+ try {
+        const res = await fetch(SCRIPT_URL + "?email=" + encodeURIComponent(email));
+        const data = await res.json();
+
+        if (data.access) {
+          status.innerText = "✅ مرحبًا " + data.name + " - لديك صلاحية الدخول";
+          setTimeout(() => { window.location.href = "dashboard.html"; }, 1500);
+        } else {
+          status.innerText = "🚫 البريد غير مصرح له بالدخول";
+        }
+
+      } catch (err) {
+        status.innerText = "⚠️ خطأ في الاتصال: " + err.message;
       }
-    })
-    .catch(err => {
-      document.getElementById("status").innerText = "⚠️ خطأ في الاتصال: " + err.message;
-    });
-}
+    }
 </script>
 
 </body>
